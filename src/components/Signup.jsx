@@ -1,23 +1,34 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; // Changed from default import
+import { jwtDecode } from 'jwt-decode';
+import { Box, Button, TextField, Typography, Alert, CircularProgress, Link } from '@mui/material';
 
 const Signup = ({ setUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'; // Set to Render URL in .env
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!email || !password) {
+      setError('Email and password are required');
+      return;
+    }
+    setLoading(true);
+    setError('');
+
     try {
-      await axios.post('http://localhost:5000/auth/signup', {
+      console.log('Attempting signup to:', `${API_URL}/auth/signup`); // Debug URL
+      await axios.post(`${API_URL}/auth/signup`, {
         email,
         password,
       });
-      // After signup, automatically log the user in
-      const response = await axios.post('http://localhost:5000/auth/login', {
+      console.log('Attempting login to:', `${API_URL}/auth/login`); // Debug URL
+      const response = await axios.post(`${API_URL}/auth/login`, {
         email,
         password,
       });
@@ -27,42 +38,85 @@ const Signup = ({ setUser }) => {
       setUser(decoded);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Signup failed');
+      console.error('Signup error:', {
+        message: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+        url: err.config?.url,
+      });
+      setError(err.response?.data?.error || 'Signup failed. Please check your input or server status.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="auth-container">
-      <h2>Signup</h2>
-      {error && <p className="error">{error}</p>}
-      <div className="auth-form">
-        <div className="form-group">
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button onClick={handleSubmit}>Sign Up</button>
-        <p>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        maxWidth: 400,
+        mx: 'auto',
+        p: 3,
+      }}
+    >
+      <Typography variant="h4" gutterBottom>
+        Signup
+      </Typography>
+      {error && (
+        <Alert severity="error" onClose={() => setError('')} sx={{ mb: 2, width: '100%' }}>
+          {error}
+        </Alert>
+      )}
+      {loading && <CircularProgress sx={{ mb: 2 }} />}
+      <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+        <TextField
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setError('');
+          }}
+          fullWidth
+          margin="normal"
+          required
+        />
+        <TextField
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setError('');
+          }}
+          fullWidth
+          margin="normal"
+          required
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          sx={{ mt: 2 }}
+          disabled={loading}
+        >
+          Sign Up
+        </Button>
+        <Typography sx={{ mt: 2, textAlign: 'center' }}>
           Already have an account?{' '}
-          <span className="link" onClick={() => navigate('/login')}>
+          <Link
+            component="button"
+            onClick={() => navigate('/login')}
+            sx={{ cursor: 'pointer' }}
+          >
             Log in
-          </span>
-        </p>
-      </div>
-    </div>
+          </Link>
+        </Typography>
+      </Box>
+    </Box>
   );
 };
 

@@ -1,3 +1,5 @@
+import './MovieCard.css';
+
 const MovieCard = ({ movie, isFavorite, onAddToFavorites }) => {
   return (
     <div className="movie-card">
@@ -8,7 +10,6 @@ const MovieCard = ({ movie, isFavorite, onAddToFavorites }) => {
       />
       <div className="movie-info">
         <h3>{movie.title}</h3>
-        <p>{movie.release_date}</p>
         <button
           onClick={onAddToFavorites}
           disabled={isFavorite}

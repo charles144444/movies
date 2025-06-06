@@ -1,0 +1,43 @@
+.movie-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 200px;
+  margin: 8px;
+  background: white;
+}
+
+.movie-poster {
+  width: 100%;
+  height: auto;
+}
+
+.movie-info {
+  padding: 12px;
+  text-align: center;
+}
+
+.movie-info h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.button {
+  background: #e50914;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.button-disabled {
+  background: #ccc;
+  color: #666;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: not-allowed;
+  font-size: 0.9rem;
+}
